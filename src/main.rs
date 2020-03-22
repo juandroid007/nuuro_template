@@ -5,7 +5,7 @@ nuuro_header!();
 
 use std::time::Duration;
 
-use nuuro::renderer::{Renderer, Affine};
+use nuuro::renderer::{Affine, Renderer};
 use nuuro::{App, AppContext, AppInfo, KeyCode};
 
 mod asset_id {
@@ -88,8 +88,12 @@ impl App<AssetId> for GameApp {
         // Function called on render a frame
         renderer.clear((121, 85, 72));
 
-        let affine = &Affine::translate(0.5 * ctx.dims().0, 0.5 * ctx.dims().1).pre_scale(self.size).pre_rotate(self.angle);
-        renderer.sprite_mode().draw_flash(affine, SpriteId::Nuuro, self.flash_ratio);
+        let affine = &Affine::translate(0.5 * ctx.dims().0, 0.5 * ctx.dims().1)
+            .pre_scale(self.size)
+            .pre_rotate(self.angle);
+        renderer
+            .sprite_mode()
+            .draw_flash(affine, SpriteId::Nuuro, self.flash_ratio);
     }
 }
 

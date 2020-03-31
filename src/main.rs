@@ -3,10 +3,8 @@ extern crate nuuro;
 
 nuuro_header!();
 
-use std::time::Duration;
-
 use nuuro::renderer::{Affine, Renderer};
-use nuuro::{App, AppContext, AppInfo, KeyCode};
+use nuuro::{App, AppContext, AppInfo, KeyCode, Timer};
 
 mod asset_id {
     include!(concat!(env!("OUT_DIR"), "/asset_id.rs"));
@@ -28,21 +26,6 @@ fn main() {
     nuuro::run(info, GameApp::new());
 }
 
-struct Timer(f64);
-
-impl Timer {
-    pub fn new() -> Timer {
-        Timer(0.)
-    }
-    pub fn step(&mut self, seconds: f64) {
-        self.0 += 1000. * seconds;
-    }
-
-    pub fn elapsed(&self) -> Duration {
-        Duration::from_millis(self.0 as u64)
-    }
-}
-
 struct GameApp {
     timer: Timer,
     flash_ratio: f64,
@@ -53,7 +36,7 @@ struct GameApp {
 impl GameApp {
     pub fn new() -> GameApp {
         GameApp {
-            timer: Timer::new(),
+            timer: Timer::new(0, true),
             flash_ratio: 0.,
             size: 0.,
             angle: 0.,
@@ -68,9 +51,8 @@ impl App<AssetId> for GameApp {
 
     fn advance(&mut self, seconds: f64, _ctx: &mut AppContext<AssetId>) {
         // Function called on every tick of the game
-        self.timer.step(seconds);
-
-        let now = self.timer.elapsed().as_millis() as f64 * 0.01;
+        let elapsed = self.timer.elapsed() as f64;
+        let now = elapsed * 0.01;
         self.flash_ratio = wave(COLOR_AMPLITUDE, ANGULAR_VELOCITY, now) + COLOR_AMPLITUDE;
         self.size = wave(SIZE_AMPLITUDE, ANGULAR_VELOCITY, now) + 1.;
         self.angle += 2. * seconds;
